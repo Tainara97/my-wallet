@@ -4,20 +4,9 @@ import jwt from "jsonwebtoken";
 
 export async function postTransaction(req, res) {
     const transaction = req.body;
-    const { authorization } = req.headers;
+    const user = res.locals.user;
 
-    const token = authorization?.replace("Bearer", "").trim();
-    if (!token) return res.sendStatus(401);
-
-    
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const user = await db.collection("users").findOne({
-                _id: new ObjectId(decoded.userId)
-            });
-
-            if (!user) return res.sendStatus(401);
-
             await db.collection("transactions").insertOne({
                 ...transaction,
                 userId: user._id,
@@ -28,7 +17,23 @@ export async function postTransaction(req, res) {
         catch (err) {
             res.status(500).send(err.message)
         }
-   
+};
 
+export async function getTransactions(req, res) {
+    const page = req.query.page || 1;
+    const limit = 10;
+    const start = (page - 1) * limit;
 
+    if (pagina <= 0) return res.sendStatus(400);
+
+    try {
+        const transactions = await db.collection("transactions")
+        .find()
+        .skip(start)
+        .limit(limit)
+        .toArray();
+        return res.send(transactions)
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
 };
