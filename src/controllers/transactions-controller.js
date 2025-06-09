@@ -28,7 +28,8 @@ export async function getTransactions(req, res) {
 
     try {
         const transactions = await db.collection("transactions")
-            .find()
+            .find({ userId: res.locals.user._id })
+            .sort({ createdAt: -1 })
             .skip(start)
             .limit(limit)
             .toArray();
@@ -53,7 +54,8 @@ export async function putTransactions(req, res) {
             return res.status(401).send("Não autorizado ou transação não encontrada");
         }
         await db.collection("transactions").updateOne({
-            _id: new ObjectId(id)
+            _id: new ObjectId(id),
+            userId: userId
         }, {
             $set: {
                 value: transaction.value,
@@ -84,7 +86,8 @@ export async function deleteTransaction (req, res)  {
         }
 
         await db.collection("transactions").deleteOne({
-            _id: new ObjectId(id)
+            _id: new ObjectId(id),
+            userId: userId
         })
         
         return res.sendStatus(204);
