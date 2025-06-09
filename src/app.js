@@ -12,9 +12,9 @@ app.use(json());
 app.use(authRouter);
 app.use(transactionsRouter);
 
-const porta = process.env.PORT
-app.listen(porta, () => {
-    console.log(`rodando na porta ${porta}`)
+const port = process.env.PORT || 5000
+app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`)
 });
 
 
